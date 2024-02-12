@@ -14,7 +14,7 @@
 					<div class="collapse navbar-collapse" id="navbarCollapse">
 						<ul class="navbar-nav mr-auto">
 							<li class="nav-item"><a th:classappend="${ativo[0] == 'inicio'}? 'active'" class="nav-link" th:href="@{/}">Início</a></li>
-							<li class="nav-item"><a th:classappend="${ativo[0] == 'conta'}? 'active'" class="nav-link" th:href="@{/conta/cadastrar}">Registrar</a></li>
+							<li sec:authorize="isAnonymous()" class="nav-item"><a th:classappend="${ativo[0] == 'conta'}? 'active'" class="nav-link" th:href="@{/conta/cadastrar}">Registrar</a></li>
 						</ul>
 						<div sec:authorize="isAnonymous()">
 							<form class="form-inline mt-2 mt-md-0" th:action="@{/entrar}" method="get">
