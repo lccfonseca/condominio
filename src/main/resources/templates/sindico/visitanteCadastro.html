@@ -1,0 +1,76 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Visitante</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light">Cadastro do Visitante</h3>
+		<div th:unless="${haCondominio}" class="alert alert-warning">
+			<h6>Condomínio não cadastrado</h6>
+			Para cadastrar blocos é preciso completar o cadastro do seu condomínio, <a class="text-warning" th:href="@{/sindico/condominio/cadastro}">clique aqui</a>.
+		</div>
+		<p th:if="${haCondominio}" th:text="${visitante.idvisitante == null} ? 'Ao salvar, um novo visitante será criado no condomínio.' : (${param.somenteLeitura} ? 'As informações não podem ser alteradas neste modo.' :  'Ao salvar, as informações do bloco atual serão atualizadas.')"></p>
+		<form th:if="${haCondominio}" th:action="@{/sindico/visitantes/cadastro}" th:object="${visitante}" th:method="${visitante.idvisitante == null} ? post : put" novalidate>
+			<fieldset th:disabled="${param.somenteLeitura}" class="mb-3">
+				<input type="hidden" th:field="*{condominio}" /> <input type="hidden" th:field="*{idvisitante}" />
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-building"></i> Informações principais
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-3">
+									<label>Nome*</label> <input autofocus class="form-control" type="text" th:errorclass="is-invalid" th:field="*{nome}" placeholder="Nome" />
+									<div class="invalid-feedback" th:errors="*{nome}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Cpf</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{cpf}" placeholder="Cpf do Visitante" />
+									<div class="invalid-feedback" th:errors="*{cpf}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Telefone</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{telefone}" placeholder="Apenas numeros" />
+									<div class="invalid-feedback" th:errors="*{telefone}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Email</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{email}" placeholder="Email" />
+									<div class="invalid-feedback" th:errors="*{email}"></div>
+								</div>								
+							</div>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+									<label>Vinculo</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{vinculo}" placeholder="vinculo" />
+									<div class="invalid-feedback" th:errors="*{vinculo}"></div>
+								</div>
+                <div class="form-group col-md-4">
+                  <label>Recorrente</label> <select class="custom-select" id="recorrente" th:errorclass="is-invalid" th:field="*{recorrente}">
+                    <option th:value="${1}" th:text="${'Sim'}"></option>
+                    <option th:value="${0}" th:text="${'Não'}"></option>
+                  </select>
+                  <div class="invalid-feedback" th:errors="*{recorrente}"></div>
+                </div>
+                <div class="form-group col-md-4">
+									<label>Dia Recorrente</label> <select class="custom-select" id="dia_recorrente" th:errorclass="is-invalid" th:field="*{dia_recorrente}">
+                    <option th:value="${0}" th:text="${'nenhum'}"></option>
+										<option th:each="dia : ${dias}" th:value="${dia.codigoDia}" th:text="${dia.nome}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{dia_recorrente}"></div>
+								</div>
+              </div>
+						</li>
+					</ul>
+				</div>
+			</fieldset>
+			<button th:unless="${param.somenteLeitura}" type="submit" class="btn btn-primary">Salvar</button>
+			<a class="btn btn-secondary" th:href="@{/sindico/visitantes}" role="button" th:text="${param.somenteLeitura}?'Voltar':_">Cancelar</a>
+		</form>
+		</main>
+	</th:block>
+	<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

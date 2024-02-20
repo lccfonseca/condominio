@@ -1,0 +1,91 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Visitantes</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light float-left">Visitantes</h3>
+		<div class="btn-group mb-3 float-right">
+			<a class="btn btn-light" th:href="@{/sindico/visitantes/cadastro}"><i class="fas fa-plus"></i> Novo</a>
+			<button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"></button>
+			<div class="dropdown-menu dropdown-menu-right">
+				<a class="dropdown-item" th:href="@{/sindico/visitantes/cadastro}">Registrar Visitante</a> <a class="dropdown-item" href="#">Criar em lote</a> <a class="dropdown-item" href="#">Importar</a>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-hover table-sm crud-list mb-0">
+				<caption class="pb-0">
+					<span th:text="${visitantes.totalElements == 0} ? 'Nenhum' : 'Há '+${visitantes.totalElements}"></span> <span th:text="${visitantes.totalElements>1} ? 'visitantes cadastrados' : 'visitante cadastrado'"></span>.
+				</caption>
+				<thead class="thead-light">
+					<tr>
+						<th scope="col">Nome</th>
+						<th scope="col">Cpf</th>
+						<th scope="col">Vinculo</th>
+						<th scope="col">Tefelone</th>
+						<th scope="col">Email</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="visitante : ${visitantes.content}">
+						<th scope="row" th:text="${visitante.nome}"></th>
+						<td th:text="${visitante.cpf}"></td>
+						<td th:text="${visitante.vinculo}"></td>
+						<td th:text="${visitante.telefone}"></td>
+						<td th:text="${visitante.email}"></td>
+						<td><a class="btn btn-outline-secondary btn-sm" th:href="@{/sindico/visitantes/{idVisitante}/cadastro(idVisitante=${visitante.idvisitante},somenteLeitura)}"><i class="fas fa-eye"></i><span> Ver</span></a> <a class="btn btn-outline-primary btn-sm" th:href="@{/sindico/visitantes/{idVisitante}/cadastro(idVisitante=${visitante.idvisitante})}"><i class="fas fa-edit"></i><span> Editar</span></a> <a class="btn btn-outline-danger btn-sm" data-toggle="modal" href="#modalExcluir" th:data-idobj="${visitante.idvisitante}" th:data-obs="${visitante}"><i class="fas fa-trash-alt"></i><span> Excluir</span></a></td>
+
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<nav th:if="${visitantes.totalPages > 1}" id="paginacao" th:with="atual=${visitantes.number+1}">
+			<ul class="mt-3 mb-0 pagination pagination-sm justify-content-center justify-content-md-end">
+				<li class="d-none d-sm-block page-item" th:if="${atual > 10}"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${atual -10},tamanho=${visitantes.size})}">-10</a></li>
+				<li class="page-item" th:unless="${visitantes.isFirst()}"><a class="page-link first" th:href="@{/sindico/visitantes(pagina=${atual -1},tamanho=${visitantes.size})}"><i class="fas fa-angle-double-left"></i><span> Anterior</span></a></li>
+				<li class="page-item" th:classappend="${visitantes.isFirst()}?'active'"><a class="page-link" th:href="@{/sindico/visitantes(pagina='1',tamanho=${visitantes.size})}">1</a></li>
+				<li class="page-item disabled" th:if="${atual > 3}"><a class="page-link" href="#">...</a></li>
+				<li th:if="${atual > 2}" class="page-item"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${atual -1},tamanho=${visitantes.size})}" th:text="${atual -1}"></a></li>
+				<li th:unless="${visitantes.isFirst() or visitantes.isLast()}" class="page-item active"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${atual},tamanho=${visitantes.size})}" th:text="${atual}"></a></li>
+				<li th:if="${atual < (visitantes.totalPages - 1)}" class="page-item"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${atual +1},tamanho=${visitantes.size})}" th:text="${atual +1}"></a></li>
+				<li class="page-item disabled" th:if="${atual < (visitantes.totalPages - 2 )}"><a class="page-link" href="#">...</a></li>
+				<li th:if="${visitantes.totalPages > 1}" class="page-item" th:classappend="${visitantes.isLast()}?'active'"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${visitantes.totalPages},tamanho=${visitantes.size})}" th:text="${visitantes.totalPages}"></a></li>
+				<li class="page-item" th:unless="${visitantes.isLast()}"><a class="page-link last" th:href="@{/sindico/visitantes(pagina=${atual +1},tamanho=${visitantes.size})}"><span>Próxima </span><i class="fas fa-angle-double-right"></i></a></li>
+				<li class="d-none d-sm-block page-item" th:if="${atual < (visitantes.totalPages-9)}"><a class="page-link" th:href="@{/sindico/visitantes(pagina=${atual +10},tamanho=${visitantes.size})}">+10</a></li>
+			</ul>
+		</nav>
+		</main>
+		<!--/* Modal */-->
+		<div th:unless="${#lists.isEmpty(visitantes)}" class="modal fade" id="modalExcluir" tabindex="-1" role="dialog">
+			<div class="modal-dialog  modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Confirmar Exclusão</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span>&times;</span>
+						</button>
+					</div>
+					<form th:action="@{/sindico/visitantes/excluir}" th:method="delete" novalidate>
+						<input type="hidden" id="idObj" name="idObj" />
+						<div class="modal-body">
+							Confirma a exclusão do visitante '<span></span>'?
+							<div class="alert alert-danger mt-3 mb-0">As visitas deste visitante, se houver, também serão excluídas.</div>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger">Excluir</button>
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</th:block>
+<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

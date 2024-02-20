@@ -81,6 +81,7 @@ CREATE TABLE blocos (
       ON UPDATE CASCADE
 );
 
+
 CREATE TABLE moradias (
   idMoradia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   sigla VARCHAR(10) NULL,
@@ -143,6 +144,41 @@ CREATE TABLE pessoasjuridicas (
   PRIMARY KEY(idPessoa),
   FOREIGN KEY(idPessoa)
     REFERENCES pessoas(idPessoa)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE visitantes (
+  idVisitante BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  idCondominio BIGINT UNSIGNED NOT NULL,
+  cpf VARCHAR(11) NULL,
+  nome VARCHAR(50) NULL,
+  telefone VARCHAR(15) NULL,
+  email VARCHAR(100) NULL,
+  recorrente TINYINT NULL,
+  dia_recorrente TINYINT NULL,
+  vinculo VARCHAR(45) NULL,
+  PRIMARY KEY(idVisitante),
+  FOREIGN KEY(idCondominio)
+    REFERENCES condominios(idCondominio)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE visitas (
+  idVisita BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  idVisitante BIGINT UNSIGNED NOT NULL,
+  idMoradia BIGINT UNSIGNED NOT NULL,
+  dt_entrada DATE NULL,
+  dt_saida DATE NULL,
+  descricao VARCHAR(200) NULL,
+  PRIMARY KEY(idVisita),
+  FOREIGN KEY(idVisitante)
+    REFERENCES visitantes(idVisitante)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(idMoradia)
+    REFERENCES moradias(idMoradia)
       ON DELETE CASCADE
       ON UPDATE CASCADE
 );

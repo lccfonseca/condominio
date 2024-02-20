@@ -102,6 +102,10 @@ public class Condominio implements Serializable, Comparable<Condominio> {
 	private List<Bloco> blocos = new ArrayList<>();
 
 	@OneToMany(mappedBy = "condominio", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OrderBy(value = "sigla")
+	private List<Visitante> visitantes = new ArrayList<>();
+
+	@OneToMany(mappedBy = "condominio", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@OrderBy(value = "nome")
 	private List<Pessoa> pessoas = new ArrayList<>();
 
@@ -255,6 +259,14 @@ public class Condominio implements Serializable, Comparable<Condominio> {
 
 	public void setBlocos(List<Bloco> blocos) {
 		this.blocos = blocos;
+	}
+
+	public List<Visitante> getVisitantes() {
+		return visitantes;
+	}
+
+	public void setVisitantes(List<Visitante> visitantes) {
+		this.visitantes = visitantes;
 	}
 
 	public List<Pessoa> getPessoas() {
