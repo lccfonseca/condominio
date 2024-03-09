@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS
 	orcamentos,subcategorias,categorias,periodos,
     pessoasjuridicas,pessoasfisicas,pessoa_moradia,pessoas,
     moradias,blocos,
-    autorizacoes,persistent_logins,usuarios,
+    autorizacoes,persistent_logins,usuarios,ocorrencias,
     condominios;
 
 DROP EVENT IF EXISTS atTotalCobrancaDiariamente;
@@ -337,6 +337,38 @@ CREATE TABLE lancamentos (
   FOREIGN KEY(idMovimento)
     REFERENCES movimentos(idMovimento)
       ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE ocorrencias  (
+  idOcorrencia BIGINT UNSIGNED NOT NULL,
+  idCondominio BIGINT UNSIGNED NOT NULL,
+  idBloco BIGINT UNSIGNED,
+  idMoradia BIGINT UNSIGNED,
+  data_registro DATE NOT NULL,
+  hora_registro TIME NOT NULL,
+  idAutor BIGINT UNSIGNED,
+  motivo VARCHAR(45) NOT NULL,
+  data_ocorrencia DATE NULL,
+  hora_ocorrencia TIME NULL,
+  descricao TEXT NULL,
+  ativo TINYINT NOT NULL,
+  PRIMARY KEY(idOcorrencia),
+  FOREIGN KEY(idCondominio)
+    REFERENCES condominios(idCondominio)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(idBloco)
+    REFERENCES blocos(idBloco)
+      ON DELETE SET NULL
+      ON UPDATE CASCADE,
+  FOREIGN KEY(idAutor)
+    REFERENCES usuarios(id)
+      ON DELETE SET NULL
+      ON UPDATE CASCADE,
+  FOREIGN KEY(idMoradia)
+    REFERENCES moradias(idMoradia)
+      ON DELETE SET NULL
       ON UPDATE CASCADE
 );
 
