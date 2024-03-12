@@ -62,8 +62,7 @@ public class CondominioServiceImpl implements CondominioService {
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 	public Condominio ler(Long id) {
-		// LATER implementar ao fazer o usuário tipo ADMIN
-		return null;
+		return condominioDao.findCondominioByIdCondominio(id);
 	}
 
 	@Override

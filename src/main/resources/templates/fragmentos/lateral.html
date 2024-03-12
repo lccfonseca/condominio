@@ -32,6 +32,8 @@
 					</ul></li>
 				<li class="nav-item"><a class="nav-link" th:classappend="${ativo[0] == 'relatorios'}? 'active'" th:href="@{/sindico/relatorios}" title="Relatórios"> <i class="fas fa-chart-line"></i> Relatórios
 				</a></li>
+				<li class="nav-item"><a class="nav-link" th:classappend="${ativo[0] == 'ocorrencias'}? 'active'" th:href="@{/sindico/ocorrencias}" title="Ocorrências"> <i class="fas fa-list-alt"></i> Ocorrências
+				</a></li>
 			</ul>
 		</nav>
 		<div id="sidebarCollapse" class="bg-primary text-light active d-md-none"></div>

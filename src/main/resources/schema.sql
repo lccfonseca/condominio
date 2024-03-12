@@ -341,7 +341,7 @@ CREATE TABLE lancamentos (
 );
 
 CREATE TABLE ocorrencias  (
-  idOcorrencia BIGINT UNSIGNED NOT NULL,
+  idOcorrencia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   idCondominio BIGINT UNSIGNED NOT NULL,
   idBloco BIGINT UNSIGNED,
   idMoradia BIGINT UNSIGNED,
@@ -352,7 +352,7 @@ CREATE TABLE ocorrencias  (
   data_ocorrencia DATE NULL,
   hora_ocorrencia TIME NULL,
   descricao TEXT NULL,
-  ativo TINYINT NOT NULL,
+  estado TINYINT NOT NULL,
   PRIMARY KEY(idOcorrencia),
   FOREIGN KEY(idCondominio)
     REFERENCES condominios(idCondominio)

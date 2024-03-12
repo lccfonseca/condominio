@@ -33,21 +33,21 @@ public class Ocorrencia implements Serializable {
     @JoinColumn(name = "idautor")
     private Usuario idAutor;
 
-    private LocalDate data_registro;
+    private LocalDate dataRegistro;
 
-    private LocalTime hora_registro;
+    private LocalTime horaRegistro;
 
     @Size(min = 1, max = 45)
     private String motivo;
 
-    private LocalDate data_ocorrencia;
+    private LocalDate dataOcorrencia;
 
-    private LocalTime hora_ocorrencia;
+    private LocalTime horaOcorrencia;
 
     private String descricao;
 
     @NotNull
-    private Boolean ativo;
+    private Integer estado;
 
     public Long getIdOcorrencia() {
         return idOcorrencia;
@@ -89,20 +89,20 @@ public class Ocorrencia implements Serializable {
         this.idAutor = idAutor;
     }
 
-    public LocalDate getData_registro() {
-        return data_registro;
+    public LocalDate getDataRegistro() {
+        return dataRegistro;
     }
 
-    public void setData_registro(LocalDate data_registro) {
-        this.data_registro = data_registro;
+    public void setDataRegistro(LocalDate dataRegistro) {
+        this.dataRegistro = dataRegistro;
     }
 
-    public LocalTime getHora_registro() {
-        return hora_registro;
+    public LocalTime getHoraRegistro() {
+        return horaRegistro;
     }
 
-    public void setHora_registro(LocalTime hora_registro) {
-        this.hora_registro = hora_registro;
+    public void setHoraRegistro(LocalTime horaRegistro) {
+        this.horaRegistro = horaRegistro;
     }
 
     public String getMotivo() {
@@ -113,20 +113,20 @@ public class Ocorrencia implements Serializable {
         this.motivo = motivo;
     }
 
-    public LocalDate getData_ocorrencia() {
-        return data_ocorrencia;
+    public LocalDate getDataOcorrencia() {
+        return dataOcorrencia;
     }
 
-    public void setData_ocorrencia(LocalDate data_ocorrencia) {
-        this.data_ocorrencia = data_ocorrencia;
+    public void setDataOcorrencia(LocalDate dataOcorrencia) {
+        this.dataOcorrencia = dataOcorrencia;
     }
 
-    public LocalTime getHora_ocorrencia() {
-        return hora_ocorrencia;
+    public LocalTime getHoraOcorrencia() {
+        return horaOcorrencia;
     }
 
-    public void setHora_ocorrencia(LocalTime hora_ocorrencia) {
-        this.hora_ocorrencia = hora_ocorrencia;
+    public void setHoraOcorrencia(LocalTime horaOcorrencia) {
+        this.horaOcorrencia = horaOcorrencia;
     }
 
     public String getDescricao() {
@@ -137,11 +137,11 @@ public class Ocorrencia implements Serializable {
         this.descricao = descricao;
     }
 
-    public Boolean getAtivo() {
-        return ativo;
+    public Integer getEstado() {
+        return estado;
     }
 
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
+    public void setEstado(Integer estado) {
+        this.estado = estado;
     }
 }

@@ -10,4 +10,6 @@ public interface CondominioDao extends PagingAndSortingRepository<Condominio, Lo
 
 	Boolean existsByCnpjAndIdCondominioNot(String cnpj, Long idCondominio);
 
+	Condominio findCondominioByIdCondominio(Long id);
+
 }
