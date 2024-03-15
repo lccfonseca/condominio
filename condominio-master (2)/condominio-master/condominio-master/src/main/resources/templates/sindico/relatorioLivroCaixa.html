@@ -1,0 +1,105 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:fragment="cssAdicional">
+	<style type="text/css">
+@page {
+	size: A4 landscape;
+}
+</style>
+</th:block>
+<title>Livro Caixa</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light">Livro Caixa</h3>
+		<div th:unless="${haCondominio}" class="alert alert-warning">
+			<h6>Condomínio não cadastrado</h6>
+			Para gerar este relatório é preciso completar o cadastro do seu condomínio, <a class="text-warning" th:href="@{/sindico/condominio/cadastro}">clique aqui</a>.
+		</div>
+		<p th:if="${haCondominio}">Este relatório traz a movimentação diária de suas contas.</p>
+		<form class="needs-validation" th:if="${haCondominio}" target="_blank" th:action="@{/sindico/relatorios/livroCaixa}" th:method="post" novalidate>
+			<fieldset class="mb-3">
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-filter"></i> Filtros
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-6">
+									<label>Data inicial</label> <input autofocus class="form-control" type="date" placeholder="Data inicial" name="inicio" id="inicio" required />
+									<div class="invalid-feedback">Campo obrigatório</div>
+								</div>
+								<div class="form-group col-md-6">
+									<label>Data final</label> <input class="form-control" th:classappend="${fimInvalido}?'is-invalid'" type="date" placeholder="Data final" name="fim" id="fim" required />
+									<div class="invalid-feedback" th:if="${fimInvalido}">Não pode ser menor que a data inicial.</div>
+									<div class="invalid-feedback">Campo obrigatório</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</fieldset>
+			<button type="submit" class="btn btn-primary">Gerar</button>
+			<a class="btn btn-secondary" th:href="@{/sindico/relatorios}" role="button">Voltar</a>
+		</form>
+		</main>
+	</th:block>
+	<th:block th:fragment="relatorio">
+		<main role="main">
+		<div id="relatorio" class="page A4 paisagem">
+			<div id="relatorio_cabecalho" class="text-center" th:object="${condominio}">
+				<h5 class="font-weight-bold" th:text="*{razaoSocial}"></h5>
+				<p>
+					<small th:text="*{endereco} +', '+ *{numeroEnd}"></small><small th:unless="${condominio.complementoEnd==null}" th:text="', '+ *{complementoEnd}"></small><br /> <small th:text="*{bairro} + ', ' + *{cidade} + ' - ' + *{estado.nome}"></small><br /> <small th:text="'Síndico: ' + *{sindico.nomeCompleto()}"></small>
+				</p>
+			</div>
+			<div id="relatorio_titulo" class="text-center">
+				<h6 class="font-weight-bold">Livro Caixa</h6>
+				<p>
+					<small th:text="'Período: ' + ${#temporals.format(inicio,'dd/MM/yyyy') + ' a ' +#temporals.format(fim,'dd/MM/yyyy')}"></small>
+				</p>
+			</div>
+			<div id="relatorio_conteudo">
+				<p>
+					<b>Saldo inicial:</b> <span th:text="'R$ '+ ${saldoInicial}"></span>
+				</p>
+				<table class="table table-sm table-borderless">
+					<thead class="border-bottom" th:unless="${#lists.isEmpty(lancamentos)}">
+						<tr>
+							<th scope="col">Data</th>
+							<th scope="col" width="45%">Descrição</th>
+							<th scope="col">Documento</th>
+							<th scope="col">Entrada</th>
+							<th scope="col">Saída</th>
+							<th scope="col">Saldo</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="lancamento, stat : ${lancamentos}">
+							<td th:text="${#temporals.format(lancamento.data,'dd/MM/yyyy')}"></td>
+							<td><span th:text="${lancamento.descricao}?:(${lancamento.detalhe()})"></span></td>
+							<td th:text="${lancamento.documento}"></td>
+							<td th:text="${lancamento.reducao}?'':('R$ '+${lancamento.valor})"></td>
+							<td th:text="${lancamento.reducao}?('R$ '+${lancamento.valor}):''"></td>
+							<td th:text="'R$ ' + ${saldos[__${stat.index}__]}"></td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(lancamentos)}">
+							<td>Sem movimento.</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>
+					<b>Saldo final:</b> <span th:text="'R$ ' + ${saldos[__${#arrays.length(saldos)-1}__]}"></span>
+				</p>
+			</div>
+		</div>
+		</main>
+	</th:block>
+	<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

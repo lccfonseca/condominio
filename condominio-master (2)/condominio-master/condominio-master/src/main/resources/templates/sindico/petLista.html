@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>Pets</title>
+
+</head>
+<body>
+<th:block th:fragment="conteudo">
+    <main role="main">
+        <h3 class="font-weight-light float-left">Pets</h3>
+        <div class="btn-group mb-3 float-right">
+            <a class="btn btn-light" th:href="@{/sindico/pet/cadastro}"><i class="fas fa-plus"></i> Novo</a>
+            <button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" th:href="@{/sindico/pet/cadastro}">Criar pet</a> <a class="dropdown-item" href="#">Importar</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm crud-list mb-0">
+                <caption class="pb-0">
+                    <span th:text="${pet.totalElements == 0} ? 'Nenhum' : 'Há '+${pet.totalElements}"></span> <span th:text="${pet.totalElements>1} ? 'pets cadastrados' : 'pet cadastrado'"></span>.
+                </caption>
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Sexo</th>
+                    <th scope="col">Nascimento</th>
+                    <th scope="col">Porte</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Raca</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pet : ${pet.content}">
+                    <th scope="row" th:text="${pet}"></th>
+                    <td th:text="${pet.nome}"></td>
+                    <td th:text="${pet.sexo}"></td>
+                    <td th:text="${#dates.format(pet.nascimento, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${pet.porte}"></td>
+                    <td th:text="${pet.tipo}"></td>
+                    <td th:text="${pet.raca}"></td>
+                    <td><a class="btn btn-outline-secondary btn-sm" th:href="@{/sindico/pet/{idPet}/cadastro(idPet=${pet.idPet},somenteLeitura)}"><i class="fas fa-eye"></i><span> Ver</span></a> <a class="btn btn-outline-primary btn-sm" th:href="@{/sindico/pet/{idPet}/cadastro(idPet=${pet.idPet})}"><i class="fas fa-edit"></i><span> Editar</span></a> <a class="btn btn-outline-danger btn-sm" data-toggle="modal" href="#modalExcluir" th:data-idobj="${pet.idPet}" th:data-obs="${pet}"><i class="fas fa-trash-alt"></i><span> Excluir</span></a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <nav th:if="${pet.totalPages > 1}" id="paginacao" th:with="atual=${pet.number+1}">
+            <ul class="mt-3 mb-0 pagination pagination-sm justify-content-center justify-content-md-end">
+                <li class="d-none d-sm-block page-item" th:if="${atual > 10}"><a class="page-link" th:href="@{/sindico/pet(pagina=${atual -10},tamanho=${pet.size})}">-10</a></li>
+                <li class="page-item" th:unless="${pet.isFirst()}"><a class="page-link first" th:href="@{/sindico/pet(pagina=${atual -1},tamanho=${pet.size})}"><i class="fas fa-angle-double-left"></i><span> Anterior</span></a></li>
+                <li class="page-item" th:classappend="${pet.isFirst()}?'active'"><a class="page-link" th:href="@{/sindico/pet(pagina='1',tamanho=${pet.size})}">1</a></li>
+                <li class="page-item disabled" th:if="${atual > 3}"><a class="page-link" href="#">...</a></li>
+                <li th:if="${atual > 2}" class="page-item"><a class="page-link" th:href="@{/sindico/pet(pagina=${atual -1},tamanho=${pet.size})}" th:text="${atual -1}"></a></li>
+                <li th:unless="${pet.isFirst() or pet.isLast()}" class="page-item active"><a class="page-link" th:href="@{/sindico/pet(pagina=${atual},tamanho=${pet.size})}" th:text="${atual}"></a></li>
+                <li th:if="${atual < (pet.totalPages - 1)}" class="page-item"><a class="page-link" th:href="@{/sindico/pet(pagina=${atual +1},tamanho=${pet.size})}" th:text="${atual +1}"></a></li>
+                <li class="page-item disabled" th:if="${atual < (pet.totalPages - 2 )}"><a class="page-link" href="#">...</a></li>
+                <li th:if="${pet.totalPages > 1}" class="page-item" th:classappend="${pet.isLast()}?'active'"><a class="page-link" th:href="@{/sindico/pet(pagina=${pet.totalPages},tamanho=${pet.size})}" th:text="${pet.totalPages}"></a></li>
+                <li class="page-item" th:unless="${pet.isLast()}"><a class="page-link last" th:href="@{/sindico/pet(pagina=${atual +1},tamanho=${pet.size})}"><span>Próxima </span><i class="fas fa-angle-double-right"></i></a></li>
+                <li class="d-none d-sm-block page-item" th:if="${atual < (pet.totalPages-9)}"><a class="page-link" th:href="@{/sindico/pet(pagina=${atual +10},tamanho=${pet.size})}">+10</a></li>
+            </ul>
+        </nav>
+    </main>
+    <!--/* Modal */-->
+    <div th:unless="${#lists.isEmpty(pet)}" class="modal fade" id="modalExcluir" tabindex="-1" role="dialog">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form th:action="@{/sindico/pet/excluir}" th:method="delete" novalidate>
+                    <input type="hidden" id="idObj" name="idObj" />
+                    <div class="modal-body">
+                        Confirma a exclusão do pet '<span></span>'?
+                        <div class="alert alert-danger mt-3 mb-0">As relações deste pet com dono, se houver, também serão excluídas.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

@@ -1,0 +1,89 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Movimentos</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light float-left">Movimentos</h3>
+		<div class="btn-group mb-3 float-right">
+			<a class="btn btn-light" th:href="@{/sindico/movimentos/cadastro}"><i class="fas fa-plus"></i> Novo</a>
+			<button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"></button>
+			<div class="dropdown-menu dropdown-menu-right">
+				<a class="dropdown-item" th:href="@{/sindico/movimentos/cadastro}">Criar movimento</a> <a class="dropdown-item" href="#">Importar</a>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-hover table-sm crud-list mb-0">
+				<caption class="pb-0">
+					<span th:text="${movimentos.totalElements == 0} ? 'Nenhum' : 'Há '+${movimentos.totalElements}"></span> <span th:text="${movimentos.totalElements>1} ? 'movimentos cadastrados' : 'movimento cadastrado'"></span>.
+				</caption>
+				<thead class="thead-light">
+					<tr>
+						<th scope="col">Data</th>
+						<th scope="col">Documento</th>
+						<th scope="col">Valor</th>
+						<th scope="col">Conta</th>
+						<th scope="col">Detalhe</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="movimento : ${movimentos.content}">
+						<th scope="row" th:text="${#temporals.format(movimento.data,'dd/MM/yyyy')}"></th>
+						<th scope="row" th:text="${movimento.documento}"></th>
+						<td th:text="|R$ ${movimento.valor}|"></td>
+						<td th:text="${movimento.conta.sigla}"></td>
+						<td th:text="${movimento.detalhe()}"></td>
+						<td><a class="btn btn-outline-secondary btn-sm" th:href="@{/sindico/movimentos/{idMovimento}/cadastro(idMovimento=${movimento.idMovimento},somenteLeitura)}"><i class="fas fa-eye"></i><span> Ver</span></a> <a class="btn btn-outline-primary btn-sm" th:href="@{/sindico/movimentos/{idMovimento}/cadastro(idMovimento=${movimento.idMovimento})}"><i class="fas fa-edit"></i><span> Editar</span></a> <a class="btn btn-outline-danger btn-sm" data-toggle="modal" href="#modalExcluir" th:data-idobj="${movimento.idMovimento}" th:data-obs="${movimento}"><i class="fas fa-trash-alt"></i><span> Excluir</span></a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<nav th:if="${movimentos.totalPages > 1}" id="paginacao" th:with="atual=${movimentos.number+1}">
+			<ul class="mt-3 mb-0 pagination pagination-sm justify-content-center justify-content-md-end">
+				<li class="d-none d-sm-block page-item" th:if="${atual > 10}"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${atual -10},tamanho=${movimentos.size})}">-10</a></li>
+				<li class="page-item" th:unless="${movimentos.isFirst()}"><a class="page-link first" th:href="@{/sindico/movimentos(pagina=${atual -1},tamanho=${movimentos.size})}"><i class="fas fa-angle-double-left"></i><span> Anterior</span></a></li>
+				<li class="page-item" th:classappend="${movimentos.isFirst()}?'active'"><a class="page-link" th:href="@{/sindico/movimentos(pagina='1',tamanho=${movimentos.size})}">1</a></li>
+				<li class="page-item disabled" th:if="${atual > 3}"><a class="page-link" href="#">...</a></li>
+				<li th:if="${atual > 2}" class="page-item"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${atual -1},tamanho=${movimentos.size})}" th:text="${atual -1}"></a></li>
+				<li th:unless="${movimentos.isFirst() or movimentos.isLast()}" class="page-item active"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${atual},tamanho=${movimentos.size})}" th:text="${atual}"></a></li>
+				<li th:if="${atual < (movimentos.totalPages - 1)}" class="page-item"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${atual +1},tamanho=${movimentos.size})}" th:text="${atual +1}"></a></li>
+				<li class="page-item disabled" th:if="${atual < (movimentos.totalPages - 2 )}"><a class="page-link" href="#">...</a></li>
+				<li th:if="${movimentos.totalPages > 1}" class="page-item" th:classappend="${movimentos.isLast()}?'active'"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${movimentos.totalPages},tamanho=${movimentos.size})}" th:text="${movimentos.totalPages}"></a></li>
+				<li class="page-item" th:unless="${movimentos.isLast()}"><a class="page-link last" th:href="@{/sindico/movimentos(pagina=${atual +1},tamanho=${movimentos.size})}"><span>Próxima </span><i class="fas fa-angle-double-right"></i></a></li>
+				<li class="d-none d-sm-block page-item" th:if="${atual < (movimentos.totalPages-9)}"><a class="page-link" th:href="@{/sindico/movimentos(pagina=${atual +10},tamanho=${movimentos.size})}">+10</a></li>
+			</ul>
+		</nav>
+		</main>
+		<!--/* Modal */-->
+		<div th:unless="${movimentos.totalElements == 0}" class="modal fade" id="modalExcluir" tabindex="-1" role="dialog">
+			<div class="modal-dialog  modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Confirmar Exclusão</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span>&times;</span>
+						</button>
+					</div>
+					<form th:action="@{/sindico/movimentos/excluir}" th:method="delete" novalidate>
+						<input type="hidden" id="idObj" name="idObj" />
+						<div class="modal-body">
+							Confirma a exclusão do movimento '<span></span>'?
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger">Excluir</button>
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</th:block>
+	<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

@@ -1,0 +1,231 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Condomínio App</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light">Painel do Condomínio</h3>
+		<div class="row mt-3">
+			<div class="col-md-3 col-sm-6 mb-4">
+				<div class="card" th:classappend="${saldoAtual}<0?'border-danger':'border-success'">
+					<div class="card-body order-1" th:classappend="${saldoAtual}<0?'text-danger':'text-success'">
+						<h5 class="card-title text-truncate">Saldo em conta</h5>
+						<p class="card-text text-truncate">
+							<span th:text="'R$ ' + ${saldoAtual}"></span> <a class="float-right" th:classappend="${saldoAtual}<0?'text-danger':'text-success'" th:href="@{/sindico/contas}" title="Cadastro de Contas de Movimentação"><i class="fas fa-arrow-circle-right"></i></a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 col-sm-6 mb-4 order-3 order-sm-2">
+				<div class="card" th:classappend="${inadimplencia}>0?'border-danger':'border-success'">
+					<div class="card-body" th:classappend="${inadimplencia}>0?'text-danger':'text-success'">
+						<h5 class="card-title text-truncate">Inadimplência</h5>
+						<p class="card-text text-truncate">
+							<span th:text="'R$ ' + ${inadimplencia}"></span> <a class="float-right" th:classappend="${inadimplencia}>0?'text-danger':'text-success'" th:href="@{/sindico/relatorios/inadimplencia}" title="Cadastro de Cobranças"><i class="fas fa-arrow-circle-right"></i></a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 col-sm-6 mb-4 order-5 order-sm-3">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title text-truncate">Info</h5>
+						<p class="card-text text-truncate">...</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 col-sm-6 mb-4 order-6 order-sm-4">
+				<div class="card border-success">
+					<div class="card-body text-success">
+						<h5 class="card-title text-truncate">Passo a passo</h5>
+						<p class="card-text text-truncate">
+							<span>100% concluído!</span> <a class="float-right text-success" href="#" title="Ver passo a passo"><i class="fas fa-arrow-circle-right"></i></a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 mb-4 order-2 order-sm-5">
+				<div class="card border-black">
+					<div class="card-header">Resumo do Mês</div>
+					<div class="card-body ">
+						<canvas id="resumoMensal" style="max-height: 200px"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 mb-4 order-4 order-sm-6">
+				<div class="card border-black">
+					<div class="card-header">Orçamento do Período</div>
+					<div class="card-body ">
+						<canvas id="orcadoRealizado" style="max-height: 200px"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+		</main>
+	</th:block>
+	<th:block th:fragment="jsAdicional">
+		<script th:src="@{/js/Chart.min.js}"></script>
+		<script th:src="@{/js/chartjs-plugin-datalabels.min.js}"></script>
+		<script th:src="@{/js/chartjs-plugin-deferred.min.js}"></script>
+		<script th:inline="javascript">
+			new Chart(document.getElementById("resumoMensal"), {
+				type : 'horizontalBar',
+				data : {
+					labels : [ 'Receitas', 'Despesas' ],
+					datasets : [ {
+						data : [[${receitaDespesaMes}]],
+						label : 'Total (R$)',
+						backgroundColor : [ 'rgba(75, 192, 192, 0.5)',
+								'rgba(255, 99, 132, 0.5)' ],
+						borderColor : [ 'rgba(75, 192, 192, 1)',
+								'rgba(255,99,132,1)' ],
+						borderWidth : 1
+					} ]
+				},
+				options : {
+					maintainAspectRatio : false,
+					animation : {
+						duration : 2000
+					},
+					layout:{
+						padding:{
+							right: 70
+						}
+					},
+					tooltips:{
+						enabled: false
+					},
+					plugins: {
+			            datalabels: {
+							anchor: 'end',
+							align: 'right',
+							formatter: function(value, context) {
+							    return 'R$ ' + value.toFixed(2);
+							}
+						},
+						deferred: {
+					        yOffset: '50%'
+					    }
+					},
+					scales : {
+						xAxes : [ {
+							display : true,
+							ticks : {
+								display : false,
+								beginAtZero : true,
+								callback : function(value, index, values) {
+									return 'R$ ' + value;
+								}
+							},
+							gridLines : {
+								display : false,
+								drawBorder : false
+							}
+						} ],
+						yAxes : [ {
+							display : true,
+							ticks : {
+								display : true
+							},
+							gridLines : {
+								display : false,
+								drawBorder : true
+							}
+						} ]
+					},
+					legend : {
+						display : false
+					}
+				}
+			});
+			new Chart(document.getElementById("orcadoRealizado"), {
+				type : 'bar',
+				data : {
+					labels : [ 'Receitas', 'Despesas' ],
+					datasets : [
+							{
+								data : [[${receitaDespesaOrcada}]],
+								label : 'Orçado',
+								backgroundColor : [ 'rgba(75, 192, 192, 0.75)',
+										'rgba(255, 99, 132, 0.75)' ],
+								borderColor : [ 'rgba(75, 192, 192, 1.5)',
+										'rgba(255,99,132,1.5)' ],
+								borderWidth : 1
+							},
+							{
+								data : [[${receitaDespesaRealizada}]],
+								label : 'Realizado',
+								backgroundColor : [ 'rgba(75, 192, 192, 0.25)',
+										'rgba(255, 99, 132, 0.25)' ],
+								borderColor : [ 'rgba(75, 192, 192, 0.5)',
+										'rgba(255,99,132,0.5)' ],
+								borderWidth : 1
+							} ]
+				},
+				options : {
+					maintainAspectRatio : false,
+					animation : {
+						duration : 2000
+					},
+					tooltips:{
+						enabled: false
+					},
+					layout:{
+						padding:{
+							top: 40
+						}
+					},
+					plugins: {
+			            datalabels: {
+							anchor: 'end',
+							align: 'top',
+							textAlign: 'center',
+							formatter: function(value, context) {
+							    return context.chart.data.datasets[context.datasetIndex].label + '\nR$ ' + value.toFixed(2);
+							}
+						},
+						deferred: {
+					        yOffset: '50%'
+					    }
+					},
+					scales : {
+						yAxes : [ {
+							display : true,
+							ticks : {
+								display : false,
+								beginAtZero : true,
+								callback : function(value, index, values) {
+									return 'R$ ' + value;
+								}
+							},
+							gridLines : {
+								display : false,
+								drawBorder : false
+							}
+						} ],
+						xAxes : [ {
+							display : true,
+							ticks : {
+								display : true
+							},
+							gridLines : {
+								display : false,
+								drawBorder : true
+							}
+						} ]
+					},
+					legend : {
+						display : false
+					}
+				}
+			});
+		</script>
+
+	</th:block>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pet</title>
+</head>
+<body>
+<th:block th:fragment="conteudo">
+    <main role="main">
+        <h3 class="font-weight-light">Cadastro de Pet </h3>
+        <div th:unless="${haCondominio}" class="alert alert-warning">
+            <h6>Pessoa não cadastrado</h6>
+            Para cadastrar pet é preciso completar o cadastro de pessoa, <a class="text-warning" th:href="@{/sindico/pessoa/cadastro}">clique aqui</a>.
+        </div>
+        <p th:if="${haCondominio}" th:text="${pet.idPet == null} ? 'Ao salvar, um novo pet será criado para uma pessoa.' : (${param.somenteLeitura} ? 'As informações não podem ser alteradas neste modo.' :  'Ao salvar, as informações do bloco atual serão atualizadas.')"></p>
+        <form th:if="${haCondominio}" th:action="@{/sindico/pet/cadastro}" th:object="${pet}" th:method="${pet.idPet == null} ? post : put" novalidate>
+            <fieldset th:disabled="${param.somenteLeitura}" class="mb-3">
+                <input type="hidden" th:field="*{condominio}" /> <input type="hidden" th:field="*{idPet}" />
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <p class="text-primary">
+                                <i class="fas fa-building"></i> Informações principais
+                            </p>
+                            <div class="form-row">
+                                <form action="/salvarPet" method="post" enctype="multipart/form-data">
+                                    <div class="form-group col-md-6">
+                                        <label>Nome</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{nome}" placeholder="Nome do pet" />
+                                        <div class="invalid-feedback" th:errors="*{nome}"></div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Sexo:</label> <input class="form-control" type="text" maxlength="1" th:errorclass="is-invalid" th:field="*{sexo}" placeholder="M para masculino e F para feminino" />
+                                        <div class="invalid-feedback" th:errors="*{sexo}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Porte</label> <input class="form-control" type="text" maxlength="1" th:errorclass="is-invalid" th:field="*{porte}" placeholder="G para grande, M para médio e P para pequeno porte" />
+                                        <div class="invalid-feedback" th:errors="*{porte}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Data de Nascimento</label> <input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{nascimento}" placeholder="Data de nascimento do pet" />
+                                        <div class="invalid-feedback" th:errors="*{nascimento}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Personalidade</label> <input class="form-control" type="text" maxlength="200" th:errorclass="is-invalid" th:field="*{personalidade}" placeholder="Descrição da personalidade do pet" />
+                                        <div class="invalid-feedback" th:errors="*{personalidade}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Suporte</label> <input class="form-control" type="text" maxlength="1" th:errorclass="is-invalid" th:field="*{animalSuporte}" placeholder="S para sim e N para não" />
+                                        <div class="invalid-feedback" th:errors="*{animalSuporte}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Suporte</label> <input class="form-control" type="text" maxlength="80" th:errorclass="is-invalid" th:field="*{suporteDescricao}" placeholder="Descrição do suporte do pet exerce" />
+                                        <div class="invalid-feedback" th:errors="*{suporteDescricao}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Raca</label> <input class="form-control" type="text" maxlength="30" th:errorclass="is-invalid" th:field="*{raca}" placeholder="Raça do pet" />
+                                        <div class="invalid-feedback" th:errors="*{raca}"></div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label for="tipo_Pet">Tipo</label>
+                                        <select class="custom-select" id="tipo_Pet" th:errorclass="is-invalid" th:field="*{tipo_Pet}">
+                                            <option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+                                            <option th:each="tipo : ${T(app.condominio.domain.enums.TipoPet).values()}" th:value="${tipo}" th:text="${tipo.getTipo()}"></option>
+                                        </select>
+                                        <div class="invalid-feedback" th:errors="*{tipo_Pet}"></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+                        <li class="list-group-item form-list">
+                            <p class="text-primary">
+                                <i class="fas fa-home"></i> Donos relacionados
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0 table-borderless">
+                                    <thead>
+                                    <tr>
+                                        <th style="min-width: 160px" class="pl-0" scope="col">Nome</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!--/* TR exemplo (Botão adicionar), classe d-none e disabled nos inputs */-->
+                                    <tr class="d-none collapse">
+                                        <td><input disabled type="hidden" name="pet.pessoa" th:value="*{idPessoa}" />
+                                            <div class="input-group">
+                                                <div class="input-group-prepend hideMe">
+                                                    <button disabled class="btn btn-outline-secondary delete" data-delete="tr" type="button" title="Excluir relação">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <select disabled class="custom-select last" name="relacoes[].moradia">
+                                                    <option th:if="${#lists.isEmpty(pessoas)}"value="" disabled>Não há pessoas cadastradas</option>
+                                                    <option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+                                                    <option th:each="m : ${pessoas}" th:value="${p.idPessoa}" th:text="${id}"></option>
+                                                </select>
+                                            </div></td>
+                                        <td><div class="input-group">
+                                            <select disabled class="custom-select" name="relacoes[].tipo">
+                                                <option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+                                                <option th:each="tr : ${tiposRelacao}" th:value="${tr}" th:text="${tr.nome}"></option>
+                                            </select> <input disabled class="form-control col-4" type="number" step=".001" max="100" name="relacoes[].participacaoDono" placeholder="Quota" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text last">%</span>
+                                            </div>
+                                        </div></td>
+                                        <td><input disabled class="form-control" type="date" name="relacoes[].dataEntrada" placeholder="A data de entrada" /></td>
+                                        <td><input disabled class="form-control" type="date" name="relacoes[].dataSaida" placeholder="A data de saída" /></td>
+                                    </tr>
+                                    <!--/* TR oficial */-->
+                                    <tr class="collapse show" th:each="relacao, stat : *{relacoes}" th:id="'row'+${stat.index}">
+                                        <td>
+                                            <input type="hidden" th:name="'relacoes[' + ${stat.index} + '].pessoa'" th:id="'relacoes' + ${stat.index} + '.pessoa'" th:value="*{idPessoa}" />
+                                            <div class="input-group">
+                                                <div class="input-group-prepend hideMe">
+                                                    <button class="btn btn-outline-secondary delete" data-delete="tr" type="button" title="Excluir relação">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <select class="custom-select last" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].moradia}">
+                                                    <option th:if="${#lists.isEmpty(moradias)}"value="" disabled>Não há moradias cadastradas</option>
+                                                    <option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+                                                    <option th:each="m : ${moradias}" th:value="${m.idMoradia}" th:text="${m}"></option>
+                                                </select>
+                                                <div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].moradia}"></div>
+                                            </div></td>
+                                        <td><div class="input-group">
+                                            <select class="custom-select" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].tipo}">
+                                                <option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+                                                <option th:each="tr : ${tiposRelacao}" th:value="${tr}" th:text="${tr.nome}"></option>
+                                            </select> <input class="form-control col-4" type="number" step=".001" max="100" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].participacaoDono}" placeholder="Quota" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text last">%</span>
+                                            </div>
+                                            <div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].tipo}"></div>
+                                            <div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].participacaoDono}"></div>
+                                        </div></td>
+                                        <td><input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].dataEntrada}" placeholder="A data de entrada" />
+                                            <div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].dataEntrada}"></div></td>
+                                        <td><input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].dataSaida}" placeholder="A data de saída" />
+                                            <div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].dataSaida}"></div></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-row mt-3 hideMe">
+                                <div class="form-group col-12">
+                                    <button class="btn btn-light btn-block clone" data-parent=".form-list table tbody" data-example=".form-list table tbody tr.d-none" type="button" title="Nova relação">
+                                        <i class="fas fa-plus"></i><span> Nova relação</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </fieldset>
+            <button th:unless="${param.somenteLeitura}" type="submit" class="btn btn-primary">Salvar</button>
+            <a class="btn btn-secondary" th:href="@{/sindico/pet}" role="button" th:text="${param.somenteLeitura}?'Voltar':_">Cancelar</a>
+        </form>
+    </main>
+</th:block>
+<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

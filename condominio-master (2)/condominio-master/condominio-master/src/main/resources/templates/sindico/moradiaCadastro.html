@@ -1,0 +1,173 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Moradia</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light">Cadastro da Moradia</h3>
+		<p th:text="${moradia.idMoradia == null} ? 'Ao salvar, uma nova moradia será criada no bloco selecionado.' : (${param.somenteLeitura} ? 'As informações não podem ser alteradas neste modo.' : 'Ao salvar, as informações da moradia atual serão atualizadas.')"></p>
+		<form th:action="@{/sindico/moradias/cadastro}" th:object="${moradia}" th:method="${moradia.idMoradia == null} ? post : put" novalidate>
+			<fieldset th:disabled="${param.somenteLeitura}" class="mb-3">
+				<input type="hidden" th:field="*{idMoradia}" />
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-home"></i> Informações principais
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-4">
+									<label>Bloco</label> <select autofocus class="custom-select" id="bloco" th:errorclass="is-invalid" th:field="*{bloco}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option th:if="${#lists.isEmpty(blocos)}" value="" disabled>Não há blocos cadastrados</option>
+										<option th:each="bloco : ${blocos}" th:value="${bloco.idBloco}" th:text="${bloco.sigla}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{bloco}"></div>
+								</div>
+								<div class="form-group col-md-4">
+									<label>Sigla</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{sigla}" placeholder="Uma abrevitura" />
+									<div class="invalid-feedback" th:errors="*{sigla}"></div>
+								</div>
+								<div class="form-group col-md-4">
+									<label>Tipo</label> <select class="custom-select" id="tipo" th:errorclass="is-invalid" th:field="*{tipo}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.nome}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{tipo}"></div>
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group col-md-3">
+									<label>Matrícula</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{matricula}" placeholder="Nº de matrícula do imóvel" />
+									<div class="invalid-feedback" th:errors="*{matricula}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Fração Ideal</label>
+									<div class="input-group">
+										<input class="form-control" type="number" step=".001" max="100" th:errorclass="is-invalid" th:field="*{fracaoIdeal}" placeholder="Porcentagem" />
+										<div class="input-group-append">
+											<span class="input-group-text last">%</span>
+										</div>
+										<div class="invalid-feedback" th:errors="*{fracaoIdeal}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Área</label>
+									<div class="input-group">
+										<input class="form-control" type="number" step=".01" th:errorclass="is-invalid" th:field="*{area}" placeholder="Metragem" />
+										<div class="input-group-append last">
+											<span class="input-group-text last">m²</span>
+										</div>
+										<div class="invalid-feedback" th:errors="*{area}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Vagas de Garagem</label> <input class="form-control" type="number" th:errorclass="is-invalid" th:field="*{vagas}" placeholder="Nº de vagas" />
+									<div class="invalid-feedback" th:errors="*{vagas}"></div>
+								</div>
+							</div>
+						</li>
+						<li class="list-group-item form-list">
+							<p class="text-primary">
+								<i class="fas fa-users"></i> Condôminos relacionados
+							</p>
+							<div class="table-responsive">
+								<table class="table table-sm mb-0 table-borderless">
+									<thead>
+										<tr>
+											<th style="min-width: 160px" class="pl-0" scope="col">Condômino</th>
+											<th style="min-width: 240px" scope="col">Tipo e Participação</th>
+											<th scope="col">Data Inicial</th>
+											<th scope="col">Data Final</th>
+										</tr>
+									</thead>
+									<tbody>
+										<!--/* TR exemplo (Botão adicionar), classe d-none e disabled nos inputs */-->
+										<tr class="d-none collapse">
+											<td><input disabled type="hidden" name="relacoes[].moradia" th:value="*{idMoradia}" />
+												<div class="input-group">
+													<div class="input-group-prepend hideMe">
+														<button disabled class="btn btn-outline-secondary delete" data-delete="tr" type="button" title="Excluir relação">
+															<i class="fas fa-trash-alt"></i>
+														</button>
+													</div>
+													<select disabled class="custom-select last" name="relacoes[].pessoa">
+														<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+														<option th:if="${#lists.isEmpty(pessoas)}" value="" disabled>Não há condôminos cadastrados</option>
+														<option th:each="p : ${pessoas}" th:value="${p.idPessoa}" th:text="${p}"></option>
+													</select>
+												</div></td>
+											<td><div class="input-group">
+													<select disabled class="custom-select" name="relacoes[].tipo">
+														<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+														<option th:each="tr : ${tiposRelacao}" th:value="${tr}" th:text="${tr.nome}"></option>
+													</select> <input disabled class="form-control col-4" type="number" step=".001" max="100" name="relacoes[].participacaoDono" placeholder="Quota" />
+													<div class="input-group-append">
+														<span class="input-group-text last">%</span>
+													</div>
+												</div></td>
+											<td><input disabled class="form-control" type="date" name="relacoes[].dataEntrada" placeholder="A data de entrada" /></td>
+											<td><input disabled class="form-control" type="date" name="relacoes[].dataSaida" placeholder="A data de saída" /></td>
+										</tr>
+										<!--/* TR oficial */-->
+										<tr class="collapse show" th:each="relacao, stat : *{relacoes}" th:id="'row'+${stat.index}">
+											<td>
+											<input type="hidden" th:name="'relacoes[' + ${stat.index} + '].moradia'" th:id="'relacoes' + ${stat.index} + '.moradia'" th:value="*{idMoradia}" />
+												<div class="input-group">
+													<div class="input-group-prepend hideMe">
+														<button class="btn btn-outline-secondary delete" data-delete="tr" type="button" title="Excluir relação">
+															<i class="fas fa-trash-alt"></i>
+														</button>
+													</div>
+													<select class="custom-select last" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].pessoa}">
+														<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+														<option th:if="${#lists.isEmpty(pessoas)}" value="" disabled>Não há condôminos cadastrados</option>
+														<option th:each="p : ${pessoas}" th:value="${p.idPessoa}" th:text="${p}"></option>
+													</select>
+													<div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].pessoa}"></div>
+												</div></td>
+											<td><div class="input-group">
+													<select class="custom-select" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].tipo}">
+														<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+														<option th:each="tr : ${tiposRelacao}" th:value="${tr}" th:text="${tr.nome}"></option>
+													</select> <input class="form-control col-4" type="number" step=".001" max="100" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].participacaoDono}" placeholder="Quota" />
+													<div class="input-group-append">
+														<span class="input-group-text last">%</span>
+													</div>
+													<div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].tipo}"></div>
+													<div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].participacaoDono}"></div>
+												</div></td>
+											<td><input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].dataEntrada}" placeholder="A data de entrada" />
+												<div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].dataEntrada}"></div></td>
+											<td><input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{relacoes[__${stat.index}__].dataSaida}" placeholder="A data de saída" />
+												<div class="invalid-feedback" th:errors="*{relacoes[__${stat.index}__].dataSaida}"></div></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="form-row mt-3 hideMe">
+								<div class="form-group col-12">
+									<button class="btn btn-light btn-block clone" data-parent=".form-list table tbody" data-example=".form-list table tbody tr.d-none" type="button" title="Nova relação">
+										<i class="fas fa-plus"></i><span> Nova relação</span>
+									</button>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</fieldset>
+			<button th:unless="${param.somenteLeitura}" type="submit" class="btn btn-primary">Salvar</button>
+			<a class="btn btn-secondary" th:href="@{/sindico/moradias}" role="button" th:text="${param.somenteLeitura}?'Voltar':_">Cancelar</a>
+		</form>
+		</main>
+	</th:block>
+<th:block th:fragment="jsAdicional">
+<script th:src="@{/js/meu.linhas-dinamicas.js}"></script>
+</th:block>
+</body>
+</html>

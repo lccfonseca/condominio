@@ -1,0 +1,10 @@
+/target/
+/bin/
+/.settings/
+/.git/
+.classpath
+.project
+/src/main/webapp/
+/.idea/
+nb-configuration.xml
+nbactions.xml

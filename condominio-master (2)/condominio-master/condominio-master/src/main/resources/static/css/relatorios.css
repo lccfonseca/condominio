@@ -1,0 +1,39 @@
+body {
+	background: rgb(82, 86, 89);
+}
+
+.page {
+	background: white;
+	display: block;
+	margin: 0.5cm auto;
+	padding: 1cm;
+	box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+}
+
+.page.A4.retrato {
+	width: 22cm;
+	min-height: 31.7cm;
+}
+
+.page.A4.paisagem {
+	width: 31.7cm;
+	min-height: 22cm;
+}
+
+@media print {
+	body, .page {
+		margin: 0;
+		padding: 0;
+		box-shadow: 0;
+		background: white;
+	}
+	.page.A4.retrato, .page.A4.paisagem {
+		width: 100%;
+		min-height: auto;
+	}
+}
+
+@page {
+	margin: 1.0cm;
+	size: A4 portrait;
+}

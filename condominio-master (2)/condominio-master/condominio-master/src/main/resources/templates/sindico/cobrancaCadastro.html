@@ -1,0 +1,215 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Cobrança</title>
+
+</head>
+<body>
+	<th:block th:fragment="conteudo">
+		<main role="main">
+		<h3 class="font-weight-light">Cadastro da Cobrança</h3>
+		<div th:unless="${haCondominio}" class="alert alert-warning">
+			<h6>Condomínio não cadastrado</h6>
+			Para cadastrar cobranças é preciso completar o cadastro do seu condomínio, <a class="text-warning" th:href="@{/sindico/condominio/cadastro}">clique aqui</a>.
+		</div>
+		<p th:if="${haCondominio}" th:text="${cobranca.idCobranca == null} ? 'Ao salvar, uma nova cobrança será criada para a moradia selecionada.' : (${param.somenteLeitura} ? 'As informações não podem ser alteradas neste modo.' :  'Ao salvar, as informações da cobrança atual serão atualizadas.')"></p>
+		<form th:if="${haCondominio}" th:action="@{/sindico/cobrancas/cadastro}" th:object="${cobranca}" th:method="${cobranca.idCobranca == null} ? post : put" novalidate>
+			<fieldset th:disabled="${param.somenteLeitura}" class="mb-3">
+				<input type="hidden" th:field="*{condominio}" /> <input type="hidden" th:field="*{idCobranca}" />
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-money-check-alt"></i> Informações principais
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-3">
+									<label>Data de emissão</label> <input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{dataEmissao}" placeholder="Data de emissão" />
+									<div class="invalid-feedback" th:errors="*{dataEmissao}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Número</label>
+									<div class="input-group">
+										<input autofocus class="form-control" type="text" th:errorclass="is-invalid" th:field="*{numero}" placeholder="Número" /> <input class="form-control last" type="text" th:errorclass="is-invalid" th:field="*{parcela}" placeholder="Parcela" />
+										<div class="invalid-feedback" th:errors="*{numero}"></div>
+										<div class="invalid-feedback" th:errors="*{parcela}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Motivo da emissão</label> <select class="custom-select" id="motivoEmissao" th:errorclass="is-invalid" th:field="*{motivoEmissao}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option th:each="motivo : ${motivosEmissao}" th:value="${motivo}" th:text="${motivo.nome}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{motivoEmissao}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Data de vencimento</label> <input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{dataVencimento}" placeholder="Data de vencimento" />
+									<div class="invalid-feedback" th:errors="*{dataVencimento}"></div>
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group col-md-6">
+									<label>Moradia</label> <select class="custom-select last" th:errorclass="is-invalid" th:field="*{moradia}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option th:if="${#lists.isEmpty(moradias)}" value="" disabled>Não há moradias cadastradas</option>
+										<option th:each="m : ${moradias}" th:value="${m.idMoradia}" th:text="${m}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{moradia}"></div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Multa por atraso</label>
+									<div class="input-group">
+										<input class="form-control" type="number" step=".001" th:errorclass="is-invalid" th:field="*{percentualMulta}" placeholder="Porcentagem" />
+										<div class="input-group-append">
+											<span class="input-group-text last">%</span>
+										</div>
+										<div class="invalid-feedback" th:errors="*{percentualMulta}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Juros por atraso</label>
+									<div class="input-group">
+										<input class="form-control" type="number" step=".001" th:errorclass="is-invalid" th:field="*{percentualJurosMes}" placeholder="Porcentagem" />
+										<div class="input-group-append">
+											<span class="input-group-text last">% ao mês</span>
+										</div>
+										<div class="invalid-feedback" th:errors="*{percentualJurosMes}"></div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Descrição</label>
+								<textarea class="form-control" rows="3" th:errorclass="is-invalid" th:field="*{descricao}" placeholder="Outros detalhes da cobrança ou uma mensagem ao devedor."></textarea>
+								<div class="invalid-feedback" th:errors="*{descricao}"></div>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-dollar-sign"></i> Valores
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-3">
+									<label>Valor</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-add" type="number" step=".01" th:errorclass="is-invalid" th:field="*{valor}" placeholder="Valor da cobrança" />
+										<div class="invalid-feedback" th:errors="*{valor}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Descontos</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-sub" type="number" step=".01" th:errorclass="is-invalid" th:field="*{desconto}" placeholder="Descontos concedidos" />
+										<div class="invalid-feedback" th:errors="*{desconto}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Abatimentos</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-sub" type="number" step=".01" th:errorclass="is-invalid" th:field="*{abatimento}" placeholder="Abatimentos efetuados" />
+										<div class="invalid-feedback" th:errors="*{abatimento}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Outras deduções</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-sub" type="number" step=".01" th:errorclass="is-invalid" th:field="*{outrasDeducoes}" placeholder="Outras deduções" />
+										<div class="invalid-feedback" th:errors="*{outrasDeducoes}"></div>
+									</div>
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group col-md-3">
+									<label>Juros</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-add" type="number" step=".01" th:errorclass="is-invalid" th:field="*{jurosMora}" placeholder="Juros de mora" />
+										<div class="invalid-feedback" th:errors="*{jurosMora}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Multa</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-add" type="number" step=".01" th:errorclass="is-invalid" th:field="*{multa}" placeholder="Multa lançada" />
+										<div class="invalid-feedback" th:errors="*{multa}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Outros acréscimos</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input class="form-control last calc-add" type="number" step=".01" th:errorclass="is-invalid" th:field="*{outrosAcrescimos}" placeholder="Outros acréscimos" />
+										<div class="invalid-feedback" th:errors="*{outrosAcrescimos}"></div>
+									</div>
+								</div>
+								<div class="form-group col-md-3">
+									<label>Total</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">R$</span>
+										</div>
+										<input readonly class="form-control last calc-tot" type="number" step=".01" th:errorclass="is-invalid" th:field="*{total}" placeholder="Total" />
+										<div class="invalid-feedback" th:errors="*{total}"></div>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li th:unless="${cobranca.idCobranca == null}" class="list-group-item">
+							<p class="text-primary">
+								<i class="fas fa-hand-holding-usd"></i> Acompanhamento
+							</p>
+							<div class="form-row">
+								<div class="form-group col-md-4">
+									<label>Situação</label> <select class="custom-select" id="situacao" th:errorclass="is-invalid" th:field="*{situacao}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option th:each="situacao : ${situacoes}" th:value="${situacao}" th:text="${situacao.nome}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{situacao}"></div>
+								</div>
+								<div class="form-group col-md-4">
+									<label>Data de recebimento</label> <input class="form-control" type="date" th:errorclass="is-invalid" th:field="*{dataRecebimento}" placeholder="Data de baixa" />
+									<div class="invalid-feedback" th:errors="*{dataRecebimento}"></div>
+								</div>
+								<div class="form-group col-md-4">
+									<label>Motivo da baixa</label> <select class="custom-select" id="motivoBaixa" th:errorclass="is-invalid" th:field="*{motivoBaixa}">
+										<option th:unless="${param.somenteLeitura}" value="" hidden="true">Selecione</option>
+										<option value="">---</option>
+										<option th:each="motivo : ${motivosBaixa}" th:value="${motivo}" th:text="${motivo.nome}"></option>
+									</select>
+									<div class="invalid-feedback" th:errors="*{motivoBaixa}"></div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</fieldset>
+			<button th:unless="${param.somenteLeitura}" type="submit" class="btn btn-primary">Salvar</button>
+			<a class="btn btn-secondary" th:href="@{/sindico/cobrancas}" role="button" th:text="${param.somenteLeitura}?'Voltar':_">Cancelar</a>
+		</form>
+		</main>
+	</th:block>
+<th:block th:fragment="jsAdicional">
+<script th:src="@{/js/meu.calculos.js}"></script>
+</th:block>
+</body>
+</html>
