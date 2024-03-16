@@ -29,7 +29,7 @@
                                 <div class="invalid-feedback" th:errors="*{motivo}"></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-5">
                                     <label>Bloco</label> <select autofocus class="custom-select" id="bloco" th:field="*{bloco}">
                                         <option th:unless="${ocorrencia.bloco != null}" value="" hidden="true">Selecione</option>
                                         <option th:if="${#lists.isEmpty(blocos)}" value="" disabled>Não há blocos cadastrados</option>
@@ -52,11 +52,11 @@
                                     <label>Hora da Ocorrência</label> <input class="form-control" type="time" name="horaocorrencia" id="horaocorrencia" placeholder="A hora da ocorrência" th:field="*{horaOcorrencia}" />
                                 </div>
                             </div>
-                            <div class="form-row">
+                            
                                 <div class="form-group">
                                     <label>Descrição</label> <input class="form-control" type="text" th:field="*{descricao}" placeholder="Uma descrição completa da ocorrência" />
                                 </div>
-                            </div>
+                            
                         </li>
                     </ul>
                 </div>
