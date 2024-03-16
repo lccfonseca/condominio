@@ -1,0 +1,71 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    
+    <title>Ocorrência</title>
+
+</head>
+<body>
+<th:block th:fragment="conteudo">
+    <main role="main">
+        <h3 class="font-weight-light">Cadastro de Ocorrência</h3>
+        <p th:text="${ocorrencia.idOcorrencia == null} ? 'Ao salvar, uma nova ocorrência será criado no condomínio.' : (${ocorrencia.estado.nome == 'Ativa'} ? 'As informações não podem ser alteradas.' :  'Ao salvar, as informações da ocorrência serão atualizadas.')"></p>
+        <form th:object="${ocorrencia}" th:action="${ocorrencia.idOcorrencia == null} ? @{/sindico/ocorrencias/cadastro} : @{/sindico/ocorrencias/editar}" th:method="post" novalidate>
+            <fieldset th:disabled="${ocorrencia.estado == 'Ativa'}" class="mb-3">
+                <input type="hidden" th:field="*{idOcorrencia}" />
+                <input type="hidden" th:field="*{dataRegistro}" />
+                <input type="hidden" th:field="*{horaRegistro}" />
+                <input type="hidden" th:field="*{estado}" />
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <p class="text-primary">
+                                <i class="fas fa-building"></i> Informações
+                            </p>
+                            
+                            <div class="form-group">
+                                <label>Motivo</label> <input class="form-control" type="text" th:errorclass="is-invalid" th:field="*{motivo}" placeholder="O motivo da criação da ocorrência" autofocus />
+                                <div class="invalid-feedback" th:errors="*{motivo}"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label>Bloco</label> <select autofocus class="custom-select" id="bloco" th:field="*{bloco}">
+                                        <option th:unless="${ocorrencia.bloco != null}" value="" hidden="true">Selecione</option>
+                                        <option th:if="${#lists.isEmpty(blocos)}" value="" disabled>Não há blocos cadastrados</option>
+                                        <option th:each="bloco : ${blocos}" th:value="${bloco.idBloco}" th:text="${bloco.sigla}"></option>
+                                </select>
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label>Moradia</label> <select class="custom-select last" th:field="*{moradia}">
+                                    <option th:unless="${ocorrencia.moradia != null}" value="" hidden="true">Selecione</option>
+                                    <option th:if="${#lists.isEmpty(moradias)}"value="" disabled>Não há moradias cadastradas</option>
+                                    <option th:each="m : ${moradias}" th:value="${m.idMoradia}" th:text="${m.sigla}"></option>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label>Data da Ocorrência</label> <input class="form-control" type="date" name="dataOcorrencia" id="dataOcorrencia" placeholder="A data da ocorrência" th:field="*{dataOcorrencia}" />
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label>Hora da Ocorrência</label> <input class="form-control" type="time" name="horaocorrencia" id="horaocorrencia" placeholder="A hora da ocorrência" th:field="*{horaOcorrencia}" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Descrição</label> <input class="form-control" type="text" th:field="*{descricao}" placeholder="Uma descrição completa da ocorrência" />
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </fieldset>
+            <button th:unless="${ocorrencia.estado.nome != 'Nova'}" type="submit" class="btn btn-primary">Salvar</button>
+            <a class="btn btn-secondary" th:href="@{/sindico/ocorrencias}" role="button" th:text="${ocorrencia.estado.nome != 'Nova'}?'Voltar':_">Cancelar</a>
+        </form>
+    </main>
+</th:block>
+<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

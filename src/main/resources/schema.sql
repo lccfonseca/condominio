@@ -352,7 +352,7 @@ CREATE TABLE ocorrencias  (
   data_ocorrencia DATE NULL,
   hora_ocorrencia TIME NULL,
   descricao TEXT NULL,
-  estado TINYINT NOT NULL,
+  estado VARCHAR(1) NOT NULL,
   PRIMARY KEY(idOcorrencia),
   FOREIGN KEY(idCondominio)
     REFERENCES condominios(idCondominio)

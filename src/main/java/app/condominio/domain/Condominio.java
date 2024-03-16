@@ -121,6 +121,10 @@ public class Condominio implements Serializable, Comparable<Condominio> {
 	@OrderBy(value = "inicio desc")
 	private List<Periodo> periodos = new ArrayList<>();
 
+	@OneToMany(mappedBy = "condominio", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OrderBy(value = "dataRegistro desc")
+	private List<Ocorrencia> ocorrencias = new ArrayList<>();
+
 	public Long getIdCondominio() {
 		return idCondominio;
 	}
@@ -295,6 +299,14 @@ public class Condominio implements Serializable, Comparable<Condominio> {
 
 	public void setPeriodos(List<Periodo> periodos) {
 		this.periodos = periodos;
+	}
+
+	public List<Ocorrencia> getOcorrencias() {
+		return ocorrencias;
+	}
+
+	public void setOcorrencias(List<Ocorrencia> ocorrencias) {
+		this.ocorrencias = ocorrencias;
 	}
 
 	@Override

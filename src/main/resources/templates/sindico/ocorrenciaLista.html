@@ -1,0 +1,87 @@
+
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    
+    <title>Ocorrências</title>
+
+</head>
+<body>
+<th:block th:fragment="conteudo">
+    <main role="main">
+        <h3 class="font-weight-light float-left">Ocorrências</h3>
+        <div class="btn-group mb-3 float-right">
+            <a class="btn btn-light" th:href="@{/sindico/ocorrencias/cadastro}"><i class="fas fa-plus"></i> Nova Ocorrência</a>
+            <button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" th:href="@{/sindico/ocorrencias/cadastro}">Criar ocorrência</a> <a class="dropdown-item" href="#">Importar</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm crud-list mb-0">
+                <caption class="pb-0">
+                    <span th:text="${ocorrencias.totalElements == 0} ? 'Nenhuma' : 'Há '+${ocorrencias.totalElements}"></span> <span th:text="${ocorrencias.totalElements>1} ? 'ocorrências cadastradas' : 'ocorrência cadastrada'"></span>.
+                </caption>
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">Motivo</th>
+                    <th scope="col">Registrada</th>
+                    <th scope="col">Ocorrido em</th>
+                    <th scope="col">Situação</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ocorrencia : ${ocorrencias.content} ">
+                    <th scope="row" th:text="${ocorrencia.motivo}"></th>
+                    <td th:text="${ocorrencia.dataRegistro} + ' ' + ${ocorrencia.horaRegistro}"></td>
+                    <td th:text="(${ocorrencia.dataOcorrencia} != null) and (${ocorrencia.dataOcorrencia} != null) ? ${ocorrencia.dataOcorrencia} + ' ' + ${ocorrencia.horaOcorrencia} : (${ocorrencia.horaOcorrencia} != null ? ${ocorrencia.horaOcorrencia} + ' data não informada': 'Não informado')"></td>
+                    <td th:text="${ocorrencia.estado.nome}"></td>
+                    <td><a class="btn btn-outline-secondary btn-sm" th:href="@{/sindico/ocorrencias/{idOcorrencia}/view(idOcorrencia=${ocorrencia.idOcorrencia})}"><i class="fas fa-eye"></i><span> Ver</span></a> <a class="btn btn-outline-primary btn-sm" th:href="@{/sindico/ocorrencias/{idOcorrencia}/cadastro(idOcorrencia=${ocorrencia.idOcorrencia})}"><i class="fas fa-edit"></i><span> Editar</span></a> <a class="btn btn-outline-danger btn-sm" data-toggle="modal" href="#modalExcluir" th:data-idobj="${ocorrencia.idOcorrencia}" th:data-obs="${ocorrencia.idOcorrencia}"><i class="fas fa-trash-alt"></i><span> Excluir</span></a> <a class="btn btn-outline-info btn-sm" th:href="@{/sindico/ocorrencias/{idOcorrencia}/togglecheck(idOcorrencia=${ocorrencia.idOcorrencia})}"><i class="fas fa-check"></i><span th:text="${ocorrencia.estado.nome == 'Finalizada' ? 'Ativar': 'Finalizar'}"></span></a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <nav th:if="${ocorrencias.totalPages > 1}" id="paginacao" th:with="atual=${ocorrencias.number+1}">
+            <ul class="mt-3 mb-0 pagination pagination-sm justify-content-center justify-content-md-end">
+                <li class="d-none d-sm-block page-item" th:if="${atual > 10}"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${atual -10},tamanho=${ocorrencias.size})}">-10</a></li>
+                <li class="page-item" th:unless="${ocorrencias.isFirst()}"><a class="page-link first" th:href="@{/sindico/ocorrencias(pagina=${atual -1},tamanho=${ocorrencias.size})}"><i class="fas fa-angle-double-left"></i><span> Anterior</span></a></li>
+                <li class="page-item" th:classappend="${ocorrencias.isFirst()}?'active'"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina='1',tamanho=${ocorrencias.size})}">1</a></li>
+                <li class="page-item disabled" th:if="${atual > 3}"><a class="page-link" href="#">...</a></li>
+                <li th:if="${atual > 2}" class="page-item"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${atual -1},tamanho=${ocorrencias.size})}" th:text="${atual -1}"></a></li>
+                <li th:unless="${ocorrencias.isFirst() or ocorrencias.isLast()}" class="page-item active"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${atual},tamanho=${ocorrencias.size})}" th:text="${atual}"></a></li>
+                <li th:if="${atual < (ocorrencias.totalPages - 1)}" class="page-item"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${atual +1},tamanho=${ocorrencias.size})}" th:text="${atual +1}"></a></li>
+                <li class="page-item disabled" th:if="${atual < (ocorrencias.totalPages - 2 )}"><a class="page-link" href="#">...</a></li>
+                <li th:if="${ocorrencias.totalPages > 1}" class="page-item" th:classappend="${ocorrencias.isLast()}?'active'"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${ocorrencias.totalPages},tamanho=${ocorrencias.size})}" th:text="${ocorrencias.totalPages}"></a></li>
+                <li class="page-item" th:unless="${ocorrencias.isLast()}"><a class="page-link last" th:href="@{/sindico/ocorrencias(pagina=${atual +1},tamanho=${ocorrencias.size})}"><span>Próxima </span><i class="fas fa-angle-double-right"></i></a></li>
+                <li class="d-none d-sm-block page-item" th:if="${atual < (ocorrencias.totalPages-9)}"><a class="page-link" th:href="@{/sindico/ocorrencias(pagina=${atual +10},tamanho=${ocorrencias.size})}">+10</a></li>
+            </ul>
+        </nav>
+    </main>
+    <!--/* Modal */-->
+    <div th:unless="${#lists.isEmpty(ocorrencias)}" class="modal fade" id="modalExcluir" tabindex="-1" role="dialog">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form th:action="@{/sindico/ocorrencias/excluir}" th:method="post" novalidate>
+                    <input type="hidden" id="idObj" name="idObj" />
+                    <div class="modal-body">
+                        Confirma a exclusão da ocorrência '<span></span>'?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="jsAdicional"></th:block>
+</body>
+</html>

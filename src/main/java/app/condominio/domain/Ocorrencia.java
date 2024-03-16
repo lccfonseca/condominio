@@ -1,6 +1,10 @@
 package app.condominio.domain;
 
+import app.condominio.domain.enums.EstadoOcorrencia;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -19,15 +23,15 @@ public class Ocorrencia implements Serializable {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcondominio")
-    private Condominio idCondominio;
+    private Condominio condominio;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idbloco")
-    private Bloco idBloco;
+    private Bloco bloco;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idmoradia")
-    private Moradia idMoradia;
+    private Moradia moradia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idautor")
@@ -37,17 +41,19 @@ public class Ocorrencia implements Serializable {
 
     private LocalTime horaRegistro;
 
+    @NotBlank
     @Size(min = 1, max = 45)
     private String motivo;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataOcorrencia;
 
     private LocalTime horaOcorrencia;
 
     private String descricao;
 
-    @NotNull
-    private Integer estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoOcorrencia estado;
 
     public Long getIdOcorrencia() {
         return idOcorrencia;
@@ -57,28 +63,28 @@ public class Ocorrencia implements Serializable {
         this.idOcorrencia = idOcorrencia;
     }
 
-    public Condominio getIdCondominio() {
-        return idCondominio;
+    public Condominio getCondominio() {
+        return condominio;
     }
 
-    public void setIdCondominio(Condominio idCondominio) {
-        this.idCondominio = idCondominio;
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
     }
 
-    public Bloco getIdBloco() {
-        return idBloco;
+    public Bloco getBloco() {
+        return bloco;
     }
 
-    public void setIdBloco(Bloco idBloco) {
-        this.idBloco = idBloco;
+    public void setBloco(Bloco bloco) {
+        this.bloco = bloco;
     }
 
-    public Moradia getIdMoradia() {
-        return idMoradia;
+    public Moradia getMoradia() {
+        return moradia;
     }
 
-    public void setIdMoradia(Moradia idMoradia) {
-        this.idMoradia = idMoradia;
+    public void setMoradia(Moradia moradia) {
+        this.moradia = moradia;
     }
 
     public Usuario getIdAutor() {
@@ -137,11 +143,12 @@ public class Ocorrencia implements Serializable {
         this.descricao = descricao;
     }
 
-    public Integer getEstado() {
+    public EstadoOcorrencia getEstado() {
         return estado;
     }
 
-    public void setEstado(Integer estado) {
+    public void setEstado(EstadoOcorrencia estado) {
         this.estado = estado;
     }
+
 }
